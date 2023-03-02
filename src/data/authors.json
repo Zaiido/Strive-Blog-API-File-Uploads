@@ -13,7 +13,7 @@
         "email": "john.doe@email.com",
         "date of birth": "1 Sep",
         "ID": "4qh2ncleocybku",
-        "avatar": "https://ui-avatars.com/api/?name=John+Doe"
+        "avatar": "http://localhost:3001/images/authorAvatars/4qh2ncleocybku.jpg"
     },
     {
         "name": "Emily",
@@ -21,6 +21,6 @@
         "email": "emily.kurti@email.com",
         "date of birth": "13 April",
         "ID": "4qh9pcleod5zql",
-        "avatar": "https://ui-avatars.com/api/?name=Emily+Kurti"
+        "avatar": "http://localhost:3001/images/authorAvatars/4qh9pcleod5zql.jpg"
     }
 ]

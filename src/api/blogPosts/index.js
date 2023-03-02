@@ -1,7 +1,7 @@
 import Express from "express";
 import { dirname, extname, join } from 'path'
 import { fileURLToPath } from "url";
-import fs from 'fs'
+import fs, { write } from 'fs'
 import uniqid from 'uniqid'
 import createHttpError from "http-errors";
 import { callBadRequest, checkPostSchema } from "./validation.js";
@@ -152,11 +152,28 @@ postsRouter.get("/:postId/comments", async (request, response, next) => {
         const posts = await getPosts()
         const post = posts.find(post => post._id === request.params.postId)
         if (post.comments) {
-            response.send({ comments: post.comments })
+            response.send(post.comments)
         } else {
-            response.send({ message: `The post with id ${request.params.postId} has no comments.` })
+            response.send(`The post with id ${request.params.postId} has no comments.`)
         }
 
+    } catch (error) {
+        next(error)
+    }
+})
+
+// DELETE COMMENT
+
+postsRouter.delete("/:postId/comments/:commentId", async (request, response, next) => {
+    try {
+        const posts = await getPosts()
+        const index = posts.findIndex(post => post._id === request.params.postId)
+        const oldPost = posts[index]
+        const newComments = oldPost.comments.filter(comment => comment._id !== request.params.commentId)
+        const newPost = { ...oldPost, comments: newComments }
+        posts[index] = newPost
+        await writePosts(posts)
+        response.status(204).send()
     } catch (error) {
         next(error)
     }

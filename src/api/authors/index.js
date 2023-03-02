@@ -1,22 +1,25 @@
 import Express from "express";
-import { fileURLToPath } from "url";
-import { dirname, extname, join } from "path";
+import { extname } from "path";
 import uniqid from "uniqid"
 import { getAuthors, saveAuthorsAvatars, writeAuthors } from "../../lib/fs-tools.js";
 import multer from "multer";
+import createHttpError from "http-errors";
 
 
 const authorsRouter = Express.Router()
-const authorsJSONPath = join(dirname(fileURLToPath(import.meta.url)), "authors.json")
 
-// 1. GET all authors
-authorsRouter.get("/", async (request, response) => {
-    const authorsFile = await getAuthors()
-    response.send(authorsFile)
+authorsRouter.get("/", async (request, response, next) => {
+    try {
+        const authorsFile = await getAuthors()
+        response.send(authorsFile)
+    } catch (error) {
+        next(error)
+    }
+
 })
 
-// 2: POST new author
-authorsRouter.post("/", async (request, response) => {
+
+authorsRouter.post("/", async (request, response, next) => {
     try {
         const authors = await getAuthors()
         let resFromMatch = await fetch('http://localhost:3000/authors/checkEmail', {
@@ -45,53 +48,87 @@ authorsRouter.post("/", async (request, response) => {
         }
 
     } catch (error) {
-        console.log(error)
+        next(error)
     }
 
 
 })
 
+
 // EXTRA 1
-authorsRouter.post("/checkEmail", async (request, response) => {
-    const authors = await getAuthors()
-
-    const matchOrNot = authors.some(author => author.email === request.body.email)
-    response.send(matchOrNot)
-})
-
-// 3. GET a specific author
-authorsRouter.get("/:authorId", async (request, response) => {
-    const authors = await getAuthors()
-
-    const author = authors.find(author => author.ID === request.params.authorId)
-
-    response.send(author)
+authorsRouter.post("/checkEmail", async (request, response, next) => {
+    try {
+        const authors = await getAuthors()
+        const matchOrNot = authors.some(author => author.email === request.body.email)
+        response.send(matchOrNot)
+    } catch (error) {
+        next(error)
+    }
 
 })
 
-// 4. PUT a specific author
-authorsRouter.put("/:authorId", async (request, response) => {
-    const authors = await getAuthors()
-    const index = authors.findIndex(author => author.ID === request.params.authorId)
-    const authorToUpdate = authors[index]
-    const updatedAuthor = { ...authorToUpdate, ...request.body }
-    authors[index] = updatedAuthor
 
-    await writeAuthors(authors)
+authorsRouter.get("/:authorId", async (request, response, next) => {
+    try {
+        const authors = await getAuthors()
 
-    response.send(updatedAuthor)
+        const foundAuthor = authors.find(author => author.ID === request.params.authorId)
+        if (foundAuthor) {
+            response.send(foundAuthor)
+
+        } else {
+            next(createHttpError(400, { message: `Author with id ${request.params.authorId} was not found` }))
+        }
+
+    } catch (error) {
+        next(error)
+    }
+
+
 })
 
-// 5. DELETE a specific author
-authorsRouter.delete("/:authorId", async (request, response) => {
-    const authors = await getAuthors()
-    const newAuthors = authors.filter(author => author.ID !== request.params.authorId)
 
-    await writeAuthors(newAuthors)
+authorsRouter.put("/:authorId", async (request, response, next) => {
+    try {
+        const authors = await getAuthors()
+        const index = authors.findIndex(author => author.ID === request.params.authorId)
+        if (index !== -1) {
+            const authorToUpdate = authors[index]
+            const updatedAuthor = { ...authorToUpdate, ...request.body }
+            authors[index] = updatedAuthor
 
-    response.status(204).send()
+            await writeAuthors(authors)
+
+            response.send(updatedAuthor)
+        } else {
+            next(createHttpError(400, { message: `Author with id ${request.params.authorId} was not found` }))
+        }
+
+    } catch (error) {
+        next(error)
+    }
+
 })
 
+
+authorsRouter.delete("/:authorId", async (request, response, next) => {
+    try {
+
+        const authors = await getAuthors()
+        const newAuthors = authors.filter(author => author.ID !== request.params.authorId)
+
+        if (authors.length !== newAuthors.length) {
+            await writeAuthors(newAuthors)
+            response.status(204).send()
+        } else {
+            next(createHttpError(400, { message: `Author with id ${request.params.authorId} was not found` }))
+        }
+
+
+    } catch (error) {
+        next(error)
+    }
+})
 
 
 authorsRouter.post("/:authorId/uploadAvatar", multer().single("avatar"), async (request, response, next) => {

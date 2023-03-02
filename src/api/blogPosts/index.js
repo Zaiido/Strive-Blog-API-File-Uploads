@@ -14,28 +14,39 @@ const postsRouter = Express.Router()
 
 
 postsRouter.get("/", async (request, response, next) => {
-    const posts = await getPosts()
+    try {
+        const posts = await getPosts()
 
-    if (request.query && request.query.title) {
-        const matchedPosts = posts.filter(post => post.title.toLowerCase().includes(request.query.title.toLowerCase()))
-        response.send(matchedPosts)
-    } else {
-        response.send(posts)
+        if (request.query && request.query.title) {
+            const matchedPosts = posts.filter(post => post.title.toLowerCase().includes(request.query.title.toLowerCase()))
+            response.send(matchedPosts)
+        } else {
+            response.send(posts)
+        }
+    } catch (error) {
+        next(error)
     }
+
 })
 
 
 postsRouter.post("/", checkPostSchema, callBadRequest, async (request, response, next) => {
+    try {
+        const newPost = { _id: uniqid(), ...request.body, createdAt: new Date(), updatedAt: new Date() }
 
-    const newPost = { _id: uniqid(), ...request.body, createdAt: new Date(), updatedAt: new Date() }
+        const posts = await getPosts()
+        posts.push(newPost)
+        await writePosts(posts)
 
-    const posts = await getPosts()
-    posts.push(newPost)
-    await writePosts(posts)
+        response.status(201).send({ _id: newPost._id })
+    } catch (error) {
+        next(error)
+    }
 
-    response.status(201).send({ _id: newPost._id })
 
 })
+
+
 postsRouter.get("/:postId", async (request, response, next) => {
     try {
         const posts = await getPosts()
@@ -52,6 +63,8 @@ postsRouter.get("/:postId", async (request, response, next) => {
     }
 
 })
+
+
 postsRouter.put("/:postId", async (request, response, next) => {
 
     try {

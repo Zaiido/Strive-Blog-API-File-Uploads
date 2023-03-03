@@ -1,7 +1,5 @@
 import Express from "express";
-import { dirname, extname, join } from 'path'
-import { fileURLToPath } from "url";
-import fs, { write } from 'fs'
+import { extname } from 'path'
 import uniqid from 'uniqid'
 import createHttpError from "http-errors";
 import { callBadRequest, checkPostSchema } from "./validation.js";

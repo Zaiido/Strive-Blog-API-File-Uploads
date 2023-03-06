@@ -1,9 +1,10 @@
 import Express from "express";
-import { extname } from "path";
 import uniqid from "uniqid"
-import { getAuthors, saveAuthorsAvatars, writeAuthors } from "../../lib/fs-tools.js";
-import multer from "multer";
+import { getAuthors, writeAuthors } from "../../lib/fs-tools.js";
 import createHttpError from "http-errors";
+import multer from "multer";
+import { v2 as cloudinary } from 'cloudinary';
+import { CloudinaryStorage } from "multer-storage-cloudinary";
 
 
 const authorsRouter = Express.Router()
@@ -131,16 +132,29 @@ authorsRouter.delete("/:authorId", async (request, response, next) => {
 })
 
 
-authorsRouter.post("/:authorId/uploadAvatar", multer().single("avatar"), async (request, response, next) => {
+
+
+const cloudinaryUploader = multer({
+    storage: new CloudinaryStorage({
+        cloudinary,
+        params: {
+            folder: "fs0522/authorsAvatars"
+        }
+    })
+}).single('avatar')
+
+
+authorsRouter.post("/:authorId/uploadAvatar", cloudinaryUploader, async (request, response, next) => {
     try {
-        const originalFileExtension = extname(request.file.originalname)
-        const fileName = request.params.authorId + originalFileExtension
-        await saveAuthorsAvatars(fileName, request.file.buffer)
+        // const originalFileExtension = extname(request.file.originalname)
+        // const fileName = request.params.authorId + originalFileExtension
+        // await saveAuthorsAvatars(fileName, request.file.buffer)
+        // console.log(request.file)
 
         const authors = await getAuthors()
         const index = authors.findIndex(author => author.ID === request.params.authorId)
         const authorToUpdate = authors[index]
-        const updatedAuthor = { ...authorToUpdate, avatar: `http://localhost:3001/images/authorAvatars/${fileName}` }
+        const updatedAuthor = { ...authorToUpdate, avatar: request.file.path }
         authors[index] = updatedAuthor
 
         await writeAuthors(authors)

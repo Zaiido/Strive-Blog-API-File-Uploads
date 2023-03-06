@@ -1,10 +1,11 @@
 import Express from "express";
-import { extname } from 'path'
-import uniqid from 'uniqid'
+import uniqid from 'uniqid';
 import createHttpError from "http-errors";
 import { callBadRequest, checkPostSchema } from "./validation.js";
-import { getPosts, savePostsCovers, writePosts } from "../../lib/fs-tools.js";
+import { getPosts, writePosts } from "../../lib/fs-tools.js";
 import multer from "multer";
+import { v2 as cloudinary } from 'cloudinary';
+import { CloudinaryStorage } from "multer-storage-cloudinary";
 
 
 const postsRouter = Express.Router()
@@ -101,18 +102,27 @@ postsRouter.delete("/:postId", async (request, response, next) => {
 
 // COVER IMAGE UPLOAD
 
-postsRouter.post("/:postId/uploadCover", multer().single("cover"), async (request, response, next) => {
+const cloudinaryUploader = multer({
+    storage: new CloudinaryStorage({
+        cloudinary,
+        params: {
+            folder: "fs0522/blogCovers"
+        }
+    })
+}).single('cover')
+
+postsRouter.post("/:postId/uploadCover", cloudinaryUploader, async (request, response, next) => {
     try {
-        const originalFileExtension = extname(request.file.originalname)
-        const fileName = request.params.postId + originalFileExtension
-        console.log(request.params.postId)
-        await savePostsCovers(fileName, request.file.buffer)
+        // const originalFileExtension = extname(request.file.originalname)
+        // const fileName = request.params.postId + originalFileExtension
+        // console.log(request.file)
+        // await savePostsCovers(fileName, request.file.buffer)
 
         const posts = await getPosts()
         const index = posts.findIndex(post => post._id === request.params.postId)
         if (index !== -1) {
             const oldPost = posts[index]
-            const updatedPost = { ...oldPost, cover: `http://localhost:3001/images/postsCover/${fileName}` }
+            const updatedPost = { ...oldPost, cover: request.file.path }
             posts[index] = updatedPost
             await writePosts(posts)
         }
@@ -177,5 +187,23 @@ postsRouter.delete("/:postId/comments/:commentId", async (request, response, nex
     }
 })
 
+// PUT COMMENT 
+
+postsRouter.put("/:postId/comments/:commentId", async (request, response, next) => {
+    try {
+        const posts = await getPosts()
+        const post = posts.find(post => post._id === request.params.postId)
+        const index = post.comments.findIndex(comment => comment._id === request.params.commentId)
+        const oldComment = post.comments[index]
+        const updatedComment = { ...oldComment, ...request.body, updatedAt: new Date() }
+        post.comments[index] = updatedComment
+
+        await writePosts(posts)
+
+        response.send(updatedComment)
+    } catch (error) {
+        next(error)
+    }
+})
 
 export default postsRouter

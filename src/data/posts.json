@@ -3,7 +3,7 @@
         "_id": "4qh8cglerjmxdd",
         "category": "Student Stories",
         "title": "I was a salesman 6 months ago, and now I am a professional web developer",
-        "cover": "http://localhost:3001/images/postsCover/4qh8cglerjmxdd.jpg",
+        "cover": "https://res.cloudinary.com/dcxywvqhz/image/upload/v1678109611/fs0522/blogCovers/nuqlgeddxhf1begvcqao.jpg",
         "readTime": {
             "value": 2,
             "unit": "minute"
@@ -19,37 +19,16 @@
             {
                 "_id": "4qh12glerngpsz",
                 "author": "Zaide Kurti",
-                "comment": "Test",
+                "comment": "Testing the update from browser",
                 "createdAt": "2023-03-02T21:59:56.579Z",
-                "updatedAt": "2023-03-02T21:59:56.579Z"
+                "updatedAt": "2023-03-06T12:54:56.840Z"
             },
             {
-                "_id": "4qh12glerngqhp",
+                "_id": "4qhbclewts6f2",
+                "comment": "Adding comment from browser",
                 "author": "Zaide Kurti",
-                "comment": "Test",
-                "createdAt": "2023-03-02T21:59:57.469Z",
-                "updatedAt": "2023-03-02T21:59:57.469Z"
-            },
-            {
-                "_id": "4qh12glerntxd1",
-                "author": "Zaide Kurti",
-                "comment": "Test",
-                "createdAt": "2023-03-02T22:10:12.901Z",
-                "updatedAt": "2023-03-02T22:10:12.901Z"
-            },
-            {
-                "_id": "4qhcowlernu6s3",
-                "author": "Zaide Kurti",
-                "comment": "Test",
-                "createdAt": "2023-03-02T22:10:25.107Z",
-                "updatedAt": "2023-03-02T22:10:25.107Z"
-            },
-            {
-                "_id": "4qhcowlernufsd",
-                "comment": "Lorem Ipsum",
-                "author": "TEST",
-                "createdAt": "2023-03-02T22:10:36.781Z",
-                "updatedAt": "2023-03-02T22:10:36.781Z"
+                "createdAt": "2023-03-06T12:55:39.901Z",
+                "updatedAt": "2023-03-06T12:55:39.901Z"
             }
         ]
     },
@@ -57,7 +36,7 @@
         "_id": "4qh3f4lerm2bo4",
         "category": "Mistery",
         "title": "Lorem Ipsum",
-        "cover": "http://localhost:3001/images/postsCover/4qh3f4lerm2bo4.jpg",
+        "cover": "https://res.cloudinary.com/dcxywvqhz/image/upload/v1678109679/fs0522/blogCovers/ykyw29gmxagvxfaoojrw.jpg",
         "readTime": {
             "value": 1,
             "unit": "minute"
@@ -72,10 +51,10 @@
         "comments": [
             {
                 "_id": "4qh12glernid2j",
-                "comment": "Lorem Ipsum",
+                "comment": "New comment ",
                 "author": "zaide",
                 "createdAt": "2023-03-02T22:01:13.387Z",
-                "updatedAt": "2023-03-02T22:01:13.387Z"
+                "updatedAt": "2023-03-06T13:13:17.917Z"
             },
             {
                 "_id": "4qh12glernikxr",

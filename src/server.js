@@ -8,7 +8,7 @@ import { join } from 'path'
 
 
 const server = Express()
-const port = 3001
+const port = process.env.PORT
 const publicFolderPath = join(process.cwd(), "./public")
 
 server.use(cors())

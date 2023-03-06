@@ -24,11 +24,11 @@
                 "updatedAt": "2023-03-06T12:54:56.840Z"
             },
             {
-                "_id": "4qhbclewts6f2",
+                "_id": "4qh1yclewz05kk",
                 "comment": "Adding comment from browser",
                 "author": "Zaide Kurti",
-                "createdAt": "2023-03-06T12:55:39.901Z",
-                "updatedAt": "2023-03-06T12:55:39.901Z"
+                "createdAt": "2023-03-06T15:21:50.131Z",
+                "updatedAt": "2023-03-06T15:21:50.131Z"
             }
         ]
     },
@@ -64,5 +64,22 @@
                 "updatedAt": "2023-03-02T22:01:23.583Z"
             }
         ]
+    },
+    {
+        "_id": "4qh3swlewzntwu",
+        "category": "Technology",
+        "title": "TEST",
+        "cover": "https://res.cloudinary.com/dcxywvqhz/image/upload/v1678117216/fs0522/blogCovers/mky5zcvmpf0hthgotkzh.jpg",
+        "readTime": {
+            "value": 1,
+            "unit": "minute"
+        },
+        "author": {
+            "name": "ZAIDE KURTI",
+            "avatar": "https://res.cloudinary.com/dcxywvqhz/image/upload/v1678116964/fs0522/authorsAvatars/htrdqidjyhalnzsuv9x0.jpg"
+        },
+        "content": "<p>test</p>",
+        "createdAt": "2023-03-06T15:40:14.765Z",
+        "updatedAt": "2023-03-06T15:40:14.765Z"
     }
 ]

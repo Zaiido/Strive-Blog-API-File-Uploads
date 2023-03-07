@@ -6,6 +6,8 @@ import { getPosts, writePosts } from "../../lib/fs-tools.js";
 import multer from "multer";
 import { v2 as cloudinary } from 'cloudinary';
 import { CloudinaryStorage } from "multer-storage-cloudinary";
+import { getPDFReadableStream } from "../../lib/pdf-tools.js";
+import { pipeline } from 'stream'
 
 
 const postsRouter = Express.Router()
@@ -201,6 +203,26 @@ postsRouter.put("/:postId/comments/:commentId", async (request, response, next) 
         await writePosts(posts)
 
         response.send(updatedComment)
+    } catch (error) {
+        next(error)
+    }
+})
+
+
+//DOWNLOAD PDF
+
+postsRouter.get("/:postId/pdf", async (request, response, next) => {
+    try {
+        response.setHeader("Content-Disposition", `attachment; filename="post${request.params.postId}.pdf"`);
+        const posts = await getPosts()
+        const post = posts.find(post => post._id === request.params.postId)
+        const source = await getPDFReadableStream(post)
+
+        const destination = response
+
+        pipeline(source, destination, error => {
+            if (error) console.log(error)
+        })
     } catch (error) {
         next(error)
     }

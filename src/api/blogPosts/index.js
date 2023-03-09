@@ -8,6 +8,7 @@ import { v2 as cloudinary } from 'cloudinary';
 import { CloudinaryStorage } from "multer-storage-cloudinary";
 import { getPDFReadableStream } from "../../lib/pdf-tools.js";
 import { pipeline } from 'stream'
+import { sendEmailToAuthor } from "../../lib/email-tools.js";
 
 const postsRouter = Express.Router()
 
@@ -222,6 +223,19 @@ postsRouter.get("/:postId/pdf", async (request, response, next) => {
         pipeline(source, destination, error => {
             if (error) console.log(error)
         })
+    } catch (error) {
+        next(error)
+    }
+})
+
+
+// SEND EMAIL
+
+postsRouter.post("/email", async (request, response, next) => {
+    try {
+        const email = request.body.email
+        await sendEmailToAuthor(email)
+        response.send({ message: "Email sent!" })
     } catch (error) {
         next(error)
     }

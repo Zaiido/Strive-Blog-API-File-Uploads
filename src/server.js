@@ -6,6 +6,7 @@ import authorsRouter from './api/authors/index.js'
 import postsRouter from './api/blogPosts/index.js'
 import { join } from 'path'
 import createHttpError from 'http-errors'
+import filesRouter from './api/file/index.js'
 
 
 const server = Express()
@@ -27,6 +28,7 @@ server.use(Express.json())
 
 server.use("/authors", authorsRouter)
 server.use("/blogPosts", postsRouter)
+server.use("/file", filesRouter)
 
 server.use(badRequestHandler)
 server.use(notfoundHandler)

@@ -9,7 +9,6 @@ import { CloudinaryStorage } from "multer-storage-cloudinary";
 import { getPDFReadableStream } from "../../lib/pdf-tools.js";
 import { pipeline } from 'stream'
 
-
 const postsRouter = Express.Router()
 
 
@@ -227,5 +226,6 @@ postsRouter.get("/:postId/pdf", async (request, response, next) => {
         next(error)
     }
 })
+
 
 export default postsRouter

@@ -3,7 +3,7 @@ import { fileURLToPath } from 'url'
 import { join, dirname } from 'path'
 import { createReadStream, createWriteStream } from 'fs'
 
-const { readJSON, writeJSON, writeFile } = fs
+const { readJSON, writeJSON, writeFile, readFile } = fs
 
 const dataFolderPath = join(dirname(fileURLToPath(import.meta.url)), "../data")
 const authorsJSONPath = join(dataFolderPath, "authors.json")
@@ -23,5 +23,6 @@ export const savePostsCovers = (fileName, fileContent) => writeFile(join(postsPu
 
 export const getPostsJSONReadableStream = () => createReadStream(postsJSONPath)
 export const getPDFWritableStream = filename => createWriteStream(join(dataFolderPath, filename))
+export const readPDFFile = () => readFile(join(dataFolderPath, "test.pdf"))
 
 export const getAuthorsJSONReadableStream = () => createReadStream(authorsJSONPath)

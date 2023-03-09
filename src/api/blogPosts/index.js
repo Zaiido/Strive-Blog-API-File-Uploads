@@ -6,9 +6,9 @@ import { getPosts, writePosts } from "../../lib/fs-tools.js";
 import multer from "multer";
 import { v2 as cloudinary } from 'cloudinary';
 import { CloudinaryStorage } from "multer-storage-cloudinary";
-import { getPDFReadableStream } from "../../lib/pdf-tools.js";
+import { asyncPDFGeneration, getPDFReadableStream } from "../../lib/pdf-tools.js";
 import { pipeline } from 'stream'
-import { sendEmailToAuthor } from "../../lib/email-tools.js";
+import { sendEmailToAuthor, sendPDFToAuthor } from "../../lib/email-tools.js";
 
 const postsRouter = Express.Router()
 
@@ -240,6 +240,22 @@ postsRouter.post("/email", async (request, response, next) => {
         next(error)
     }
 })
+
+
+postsRouter.post("/:postId/email", async (request, response, next) => {
+    try {
+        const posts = await getPosts()
+        const post = posts.find(post => post._id === request.params.postId)
+        const postPDF = await asyncPDFGeneration(post)
+        const email = request.body.email
+        await sendPDFToAuthor(email)
+        response.send({ message: "Email sent!" })
+        // response.send({ message: "PDF GENERATED CORRECTLY" })
+    } catch (error) {
+        next(error)
+    }
+})
+
 
 
 export default postsRouter

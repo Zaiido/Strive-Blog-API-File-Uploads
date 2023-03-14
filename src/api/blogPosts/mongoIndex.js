@@ -7,6 +7,7 @@ const postsRouter = Express.Router()
 
 postsRouter.get("/", async (request, response, next) => {
     try {
+        response.setHeader('Access-Control-Allow-Origin', '*')
         const blogs = await BlogPostsModel.find()
         response.send(blogs)
     } catch (error) {

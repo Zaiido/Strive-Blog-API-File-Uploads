@@ -24,7 +24,9 @@ server.use(cors({
             corsNext(createHttpError(400, `Origin ${currentOrigin} is not in the whitelist!`))
         }
     },
-    exposedHeaders: ['Access-Control-Allow-Origin']
+    exposedHeaders: ['Access-Control-Allow-Origin'],
+    credentials: true,
+    origin: [process.env.FE_PROD_URL]
 }))
 
 server.use(Express.static(publicFolderPath))

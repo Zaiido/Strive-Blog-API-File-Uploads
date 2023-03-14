@@ -23,8 +23,10 @@ server.use(cors({
         } else {
             corsNext(createHttpError(400, `Origin ${currentOrigin} is not in the whitelist!`))
         }
-    }
+    },
+    exposedHeaders: ['Access-Control-Allow-Origin']
 }))
+
 server.use(Express.static(publicFolderPath))
 server.use(Express.json())
 

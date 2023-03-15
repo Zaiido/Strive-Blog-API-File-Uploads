@@ -1,14 +1,29 @@
 import Express from 'express'
 import createHttpError from 'http-errors'
 import BlogPostsModel from './model.js'
+import q2m from 'query-to-mongo'
 
 
 const postsRouter = Express.Router()
 
 postsRouter.get("/", async (request, response, next) => {
     try {
-        const blogs = await BlogPostsModel.find()
-        response.send(blogs)
+        const mongoQuery = q2m(request.query)
+        console.log(mongoQuery)
+
+        const blogs = await BlogPostsModel.find(mongoQuery.criteria, mongoQuery.options.fields)
+            .skip(mongoQuery.options.skip)
+            .limit(mongoQuery.options.limit)
+            .sort(mongoQuery.options.sort)
+
+        const totalDocuments = await BlogPostsModel.countDocuments(mongoQuery.criteria)
+        console.log(totalDocuments)
+        response.send({
+            links: mongoQuery.links(`${process.env.BE_URL}/blogPosts`, totalDocuments),
+            totalDocuments,
+            numberOfPages: Math.ceil(totalDocuments / mongoQuery.options.limit),
+            blogs
+        })
     } catch (error) {
         next(error)
     }

@@ -17,7 +17,6 @@ postsRouter.get("/", async (request, response, next) => {
             .sort(mongoQuery.options.sort)
 
         const totalDocuments = await BlogPostsModel.countDocuments(mongoQuery.criteria)
-        console.log(totalDocuments)
         response.send({
             links: mongoQuery.links(`${process.env.BE_URL}/blogPosts`, totalDocuments),
             totalDocuments,

@@ -42,7 +42,15 @@ const postSchema = new Schema({
     content: {
         type: String,
         required: true
-    }
+    },
+    comments: [
+        {
+            "author": String,
+            "comment": String,
+            "createdAt": Date,
+            "updatedAt": Date
+        }
+    ]
 }, { timestamps: true })
 
 

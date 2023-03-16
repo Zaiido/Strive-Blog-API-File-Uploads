@@ -191,14 +191,14 @@ postsRouter.post("/:postId/likes", async (request, response, next) => {
                 { $pull: { likes: authorId } },
                 { new: true, runValidators: true }
             )
-            response.send({ likesInTotal: postToUpdate.likes.length, likes: postToUpdate.likes })
+            response.send({ likesInTotal: postToUpdate.likes.length, likesArray: postToUpdate.likes })
         } else {
             const postToUpdate = await BlogPostsModel.findByIdAndUpdate(
                 request.params.postId,
                 { $push: { likes: authorId } },
                 { new: true, runValidators: true }
             )
-            response.send({ likesInTotal: postToUpdate.likes.length, likes: postToUpdate.likes })
+            response.send({ likesInTotal: postToUpdate.likes.length, likesArray: postToUpdate.likes })
         }
 
     } catch (error) {

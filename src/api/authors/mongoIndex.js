@@ -51,7 +51,7 @@ authorsRouter.put("/:authorId", async (req, res, next) => {
 
 authorsRouter.delete("/:authorId", async (req, res, next) => {
     try {
-        const deletedAuthor = await AuthorsModel.findByIdAndUpdate(req.params.authorId)
+        const deletedAuthor = await AuthorsModel.findByIdAndDelete(req.params.authorId)
         if (deletedAuthor) {
             res.status(204).send()
         } else {

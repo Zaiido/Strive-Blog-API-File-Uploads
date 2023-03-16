@@ -36,7 +36,7 @@ const postSchema = new Schema({
     },
     comments: [
         {
-            "author": String,
+            "author": { type: Schema.Types.ObjectId, ref: "Author" },
             "comment": String,
             "createdAt": Date,
             "updatedAt": Date

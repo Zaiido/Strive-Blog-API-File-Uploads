@@ -2,13 +2,14 @@ import Express from 'express'
 import listEndpoints from 'express-list-endpoints'
 import cors from 'cors'
 import { badRequestHandler, generalErrorHandler, notfoundHandler } from './errorHandlers.js'
-import authorsRouter from './api/authors/index.js'
+// import authorsRouter from './api/authors/index.js'
 // import postsRouter from './api/blogPosts/index.js'
 import { join } from 'path'
 import createHttpError from 'http-errors'
 import filesRouter from './api/file/index.js'
 import mongoose from 'mongoose'
 import postsRouter from './api/blogPosts/mongoIndex.js'
+import authorsRouter from './api/authors/mongoIndex.js'
 
 
 const server = Express()

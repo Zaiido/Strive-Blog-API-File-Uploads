@@ -23,22 +23,13 @@ const postSchema = new Schema({
         unit: {
             type: String,
             enum: {
-                values: ['minute', 'hour', 'day'],
+                values: ['minute', 'minutes', 'hour', 'hours', 'day'],
                 message: 'Read time unit is required and must be either minute, hour, or day',
             },
             required: true
         },
     },
-    author: {
-        name: {
-            type: String,
-            required: true
-        },
-        avatar: {
-            type: String,
-            required: true
-        },
-    },
+    authors: [{ type: Schema.Types.ObjectId, ref: "Author" }],
     content: {
         type: String,
         required: true
@@ -50,6 +41,9 @@ const postSchema = new Schema({
             "createdAt": Date,
             "updatedAt": Date
         }
+    ],
+    likes: [
+        { type: Schema.Types.ObjectId, ref: "Author" }
     ]
 }, { timestamps: true })
 

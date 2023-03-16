@@ -1,4 +1,4 @@
-import Express from 'express'
+import Express, { response } from 'express'
 import createHttpError from 'http-errors'
 import BlogPostsModel from './model.js'
 import q2m from 'query-to-mongo'
@@ -181,6 +181,39 @@ postsRouter.delete("/:postId/comment/:commentId", async (request, response, next
 })
 
 
+// LIKES
+
+postsRouter.post("/:postId/likes", async (request, response, next) => {
+    try {
+        // Check if post exists
+        const post = await BlogPostsModel.findById(request.params.postId)
+        if (!post) return next(createHttpError(404, { message: `Blog with _id ${request.params.postId} was not found!` }))
+
+        // Author/User ID from request.body.authorId
+        const { authorId } = request.body
+
+        const authorInLikes = post.likes.find(authorRef => authorId === authorRef.toString())
+
+        if (authorInLikes) {
+            const postToUpdate = await BlogPostsModel.findByIdAndUpdate(
+                request.params.postId,
+                { $pull: { likes: authorId } },
+                { new: true, runValidators: true }
+            )
+            response.send({ likesInTotal: postToUpdate.likes.length, likes: postToUpdate.likes })
+        } else {
+            const postToUpdate = await BlogPostsModel.findByIdAndUpdate(
+                request.params.postId,
+                { $push: { likes: authorId } },
+                { new: true, runValidators: true }
+            )
+            response.send({ likesInTotal: postToUpdate.likes.length, likes: postToUpdate.likes })
+        }
+
+    } catch (error) {
+        next(error)
+    }
+})
 
 
 export default postsRouter

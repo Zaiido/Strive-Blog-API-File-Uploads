@@ -47,5 +47,13 @@ const postSchema = new Schema({
     ]
 }, { timestamps: true })
 
+postSchema.static("findBlogs", async function (query) {
+    const blogs = await this.find(query.criteria, query.options.fields)
+        .skip(query.options.skip)
+        .limit(query.options.limit)
+        .sort(query.options.sort)
+    const totalDocuments = await this.countDocuments(query.criteria)
+    return { blogs, totalDocuments }
+})
 
 export default model("BlogPost", postSchema)

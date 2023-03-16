@@ -9,14 +9,8 @@ const postsRouter = Express.Router()
 postsRouter.get("/", async (request, response, next) => {
     try {
         const mongoQuery = q2m(request.query)
-        console.log(mongoQuery)
 
-        const blogs = await BlogPostsModel.find(mongoQuery.criteria, mongoQuery.options.fields)
-            .skip(mongoQuery.options.skip)
-            .limit(mongoQuery.options.limit)
-            .sort(mongoQuery.options.sort)
-
-        const totalDocuments = await BlogPostsModel.countDocuments(mongoQuery.criteria)
+        const { blogs, totalDocuments } = await BlogPostsModel.findBlogs(mongoQuery)
         response.send({
             links: mongoQuery.links(`${process.env.BE_URL}/blogPosts`, totalDocuments),
             totalDocuments,
@@ -185,13 +179,10 @@ postsRouter.delete("/:postId/comment/:commentId", async (request, response, next
 
 postsRouter.post("/:postId/likes", async (request, response, next) => {
     try {
-        // Check if post exists
         const post = await BlogPostsModel.findById(request.params.postId)
         if (!post) return next(createHttpError(404, { message: `Blog with _id ${request.params.postId} was not found!` }))
 
-        // Author/User ID from request.body.authorId
         const { authorId } = request.body
-
         const authorInLikes = post.likes.find(authorRef => authorId === authorRef.toString())
 
         if (authorInLikes) {

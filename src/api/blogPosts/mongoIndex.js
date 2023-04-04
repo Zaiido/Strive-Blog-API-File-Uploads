@@ -22,7 +22,6 @@ postsRouter.get("/me/stories", basicAuthMiddleware, async (request, response, ne
 postsRouter.get("/", async (request, response, next) => {
     try {
         const mongoQuery = q2m(request.query)
-        console.log(request.author)
         const { blogs, totalDocuments } = await BlogPostsModel.findBlogs(mongoQuery)
         response.send({
             links: mongoQuery.links(`${process.env.BE_URL}/blogPosts`, totalDocuments),

@@ -1,8 +1,22 @@
 import mongoose from "mongoose"
 
+export const unauthorizedErrorHandler = (error, request, respose, next) => {
+    if (error.status === 401) {
+        respose.status(401).send({ success: false, message: error.message })
+    } else {
+        next(error)
+    }
+}
 
+export const forbiddenErrorHandler = (error, request, respose, next) => {
+    if (error.status === 403) {
+        respose.status(403).send({ success: false, message: error.message })
+    } else {
+        next(error)
+    }
+}
 
-export const badRequestHandler = (error, request, response, next) => {
+export const badRequestErrorHandler = (error, request, response, next) => {
     if (error.status === 400 || error instanceof mongoose.Error.ValidationError) {
         if (error.errorsList) {
             response.status(400).send({ message: error.message, errorsList: error.errorsList.map(e => e.msg) })
@@ -19,7 +33,7 @@ export const badRequestHandler = (error, request, response, next) => {
     }
 }
 
-export const notfoundHandler = (error, request, response, next) => {
+export const notfoundErrorHandler = (error, request, response, next) => {
     if (error.status === 404) {
         response.status(404).send({ message: error.message })
     } else {

@@ -49,6 +49,7 @@ const postSchema = new Schema({
 
 postSchema.static("findBlogs", async function (query) {
     const blogs = await this.find(query.criteria, query.options.fields)
+        .populate('authors')
         .skip(query.options.skip)
         .limit(query.options.limit)
         .sort(query.options.sort)

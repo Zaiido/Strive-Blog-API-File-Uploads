@@ -1,6 +1,8 @@
 import express from "express"
 import createError from "http-errors"
 import AuthorsModel from "./model.js"
+import { basicAuthMiddleware } from "../../lib/auth/basic.js"
+
 
 const authorsRouter = express.Router()
 
@@ -22,6 +24,8 @@ authorsRouter.get("/", async (req, res, next) => {
         next(error)
     }
 })
+
+
 
 authorsRouter.get("/:authorId", async (req, res, next) => {
     try {

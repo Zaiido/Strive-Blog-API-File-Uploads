@@ -2,7 +2,7 @@ import mongoose from "mongoose"
 
 export const unauthorizedErrorHandler = (error, request, respose, next) => {
     if (error.status === 401) {
-        respose.status(401).send({ success: false, message: error.message })
+        respose.status(401).send({ message: error.message })
     } else {
         next(error)
     }
@@ -10,7 +10,7 @@ export const unauthorizedErrorHandler = (error, request, respose, next) => {
 
 export const forbiddenErrorHandler = (error, request, respose, next) => {
     if (error.status === 403) {
-        respose.status(403).send({ success: false, message: error.message })
+        respose.status(403).send({ message: error.message })
     } else {
         next(error)
     }

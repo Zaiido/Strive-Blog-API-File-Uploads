@@ -1,15 +1,28 @@
-import Express, { response } from 'express'
+import Express from 'express'
 import createHttpError from 'http-errors'
 import BlogPostsModel from './model.js'
 import q2m from 'query-to-mongo'
+import { basicAuthMiddleware } from '../../lib/auth/basic.js'
 
 
 const postsRouter = Express.Router()
 
+
+postsRouter.get("/me/stories", basicAuthMiddleware, async (request, response, next) => {
+    try {
+        const blogs = await BlogPostsModel.find({
+            authors: { $in: [request.author._id] }
+        }).populate('authors')
+        response.send(blogs)
+    } catch (error) {
+        next(error)
+    }
+})
+
 postsRouter.get("/", async (request, response, next) => {
     try {
         const mongoQuery = q2m(request.query)
-
+        console.log(request.author)
         const { blogs, totalDocuments } = await BlogPostsModel.findBlogs(mongoQuery)
         response.send({
             links: mongoQuery.links(`${process.env.BE_URL}/blogPosts`, totalDocuments),
@@ -22,9 +35,10 @@ postsRouter.get("/", async (request, response, next) => {
     }
 })
 
-postsRouter.post("/", async (request, response, next) => {
+postsRouter.post("/", basicAuthMiddleware, async (request, response, next) => {
     try {
         const newBlog = new BlogPostsModel(request.body)
+        newBlog.authors = [...newBlog.authors, request.author._id] // Add the author _id from the authorized author
         const { _id } = await newBlog.save()
         response.status(201).send({ _id })
     } catch (error) {
@@ -45,13 +59,19 @@ postsRouter.get("/:postId", async (request, response, next) => {
     }
 })
 
-postsRouter.put("/:postId", async (request, response, next) => {
+postsRouter.put("/:postId", basicAuthMiddleware, async (request, response, next) => {
     try {
-        const updatedBlog = await BlogPostsModel.findByIdAndUpdate(request.params.postId, request.body, { new: true, runValidators: true })
-        if (updatedBlog) {
-            response.send(updatedBlog)
+        const blog = await BlogPostsModel.findById(request.params.postId)
+        if (blog.authors.includes(request.author._id) || request.author.role === 'Admin') {
+            const updatedBlog = await BlogPostsModel.findByIdAndUpdate(request.params.postId, request.body, { new: true, runValidators: true })
+            if (updatedBlog) {
+                response.send(updatedBlog)
+            } else {
+                next(createHttpError(404, { message: `Blog with _id ${request.params.postId} was not found!` }))
+            }
+
         } else {
-            next(createHttpError(404, { message: `Blog with _id ${request.params.postId} was not found!` }))
+            next(createHttpError(403, "You are not authorized to update this blog!"))
         }
 
     } catch (error) {
@@ -59,13 +79,19 @@ postsRouter.put("/:postId", async (request, response, next) => {
     }
 })
 
-postsRouter.delete("/:postId", async (request, response, next) => {
+postsRouter.delete("/:postId", basicAuthMiddleware, async (request, response, next) => {
     try {
-        const deletedBlog = await BlogPostsModel.findByIdAndDelete(request.params.postId)
-        if (deletedBlog) {
-            response.status(204).send()
+        const blog = await BlogPostsModel.findById(request.params.postId)
+        if (blog.authors.includes(request.author._id) || request.author.role === 'Admin') {
+            const deletedBlog = await BlogPostsModel.findByIdAndDelete(request.params.postId)
+            if (deletedBlog) {
+                response.status(204).send()
+            } else {
+                next(createHttpError(404, { message: `Blog with _id ${request.params.postId} was not found!` }))
+            }
         } else {
-            next(createHttpError(404, { message: `Blog with _id ${request.params.postId} was not found!` }))
+            next(createHttpError(403, "You are not authorized to delete this blog!"))
+
         }
 
     } catch (error) {

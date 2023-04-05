@@ -48,7 +48,7 @@ postsRouter.post("/", JWTAuthMiddleware, async (request, response, next) => {
 
 postsRouter.get("/:postId", JWTAuthMiddleware, async (request, response, next) => {
     try {
-        const blog = await BlogPostsModel.findById(request.params.postId)
+        const blog = await BlogPostsModel.findById(request.params.postId).populate('authors')
         if (blog) {
             response.send(blog)
         } else {

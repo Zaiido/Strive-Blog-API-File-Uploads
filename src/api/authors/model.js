@@ -27,7 +27,9 @@ const authorSchema = new Schema({
     },
     role: {
         type: String,
-        required: true
+        required: true,
+        default: "User",
+        enum: ["Admin", "User"]
     }
 
 }, { timestamps: true })

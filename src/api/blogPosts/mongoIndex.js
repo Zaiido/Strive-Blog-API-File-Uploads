@@ -2,13 +2,14 @@ import Express from 'express'
 import createHttpError from 'http-errors'
 import BlogPostsModel from './model.js'
 import q2m from 'query-to-mongo'
-import { basicAuthMiddleware } from '../../lib/auth/basic.js'
+import { JWTAuthMiddleware } from "../../lib/auth/jwtAuth.js"
+
 
 
 const postsRouter = Express.Router()
 
 
-postsRouter.get("/me/stories", basicAuthMiddleware, async (request, response, next) => {
+postsRouter.get("/me/stories", JWTAuthMiddleware, async (request, response, next) => {
     try {
         const blogs = await BlogPostsModel.find({
             authors: { $in: [request.author._id] }
@@ -19,7 +20,7 @@ postsRouter.get("/me/stories", basicAuthMiddleware, async (request, response, ne
     }
 })
 
-postsRouter.get("/", async (request, response, next) => {
+postsRouter.get("/", JWTAuthMiddleware, async (request, response, next) => {
     try {
         const mongoQuery = q2m(request.query)
         const { blogs, totalDocuments } = await BlogPostsModel.findBlogs(mongoQuery)
@@ -34,7 +35,7 @@ postsRouter.get("/", async (request, response, next) => {
     }
 })
 
-postsRouter.post("/", basicAuthMiddleware, async (request, response, next) => {
+postsRouter.post("/", JWTAuthMiddleware, async (request, response, next) => {
     try {
         const newBlog = new BlogPostsModel(request.body)
         newBlog.authors = [...newBlog.authors, request.author._id] // Add the author _id from the authorized author
@@ -45,7 +46,7 @@ postsRouter.post("/", basicAuthMiddleware, async (request, response, next) => {
     }
 })
 
-postsRouter.get("/:postId", async (request, response, next) => {
+postsRouter.get("/:postId", JWTAuthMiddleware, async (request, response, next) => {
     try {
         const blog = await BlogPostsModel.findById(request.params.postId)
         if (blog) {
@@ -58,7 +59,7 @@ postsRouter.get("/:postId", async (request, response, next) => {
     }
 })
 
-postsRouter.put("/:postId", basicAuthMiddleware, async (request, response, next) => {
+postsRouter.put("/:postId", JWTAuthMiddleware, async (request, response, next) => {
     try {
         const blog = await BlogPostsModel.findById(request.params.postId)
         if (blog.authors.includes(request.author._id) || request.author.role === 'Admin') {
@@ -78,7 +79,7 @@ postsRouter.put("/:postId", basicAuthMiddleware, async (request, response, next)
     }
 })
 
-postsRouter.delete("/:postId", basicAuthMiddleware, async (request, response, next) => {
+postsRouter.delete("/:postId", JWTAuthMiddleware, async (request, response, next) => {
     try {
         const blog = await BlogPostsModel.findById(request.params.postId)
         if (blog.authors.includes(request.author._id) || request.author.role === 'Admin') {

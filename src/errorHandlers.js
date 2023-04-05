@@ -25,7 +25,8 @@ export const badRequestErrorHandler = (error, request, response, next) => {
             response.status(400).send({ message: error.message })
 
         }
-    } else if (error instanceof mongoose.Error.CastError) {
+    }
+    else if (error instanceof mongoose.Error.CastError) {
         response.status(400).send({ message: "You've sent a wrong _id in request params" })
     }
     else {

@@ -1,13 +1,14 @@
 import Express from "express"
 import createError from "http-errors"
 import AuthorsModel from "./model.js"
-import { basicAuthMiddleware } from "../../lib/auth/basic.js"
 import createHttpError from "http-errors"
+import { createAccessToken } from "../../lib/auth/tools.js"
+import { JWTAuthMiddleware } from "../../lib/auth/jwtAuth.js"
 
 
 const authorsRouter = Express.Router()
 
-authorsRouter.post("/", async (request, response, next) => {
+authorsRouter.post("/register", async (request, response, next) => {
     try {
         const newAuthor = new AuthorsModel(request.body)
         const { _id } = await newAuthor.save()
@@ -17,7 +18,7 @@ authorsRouter.post("/", async (request, response, next) => {
     }
 })
 
-authorsRouter.get("/", async (request, response, next) => {
+authorsRouter.get("/", JWTAuthMiddleware, async (request, response, next) => {
     try {
         const authors = await AuthorsModel.find()
         response.send(authors)
@@ -27,7 +28,7 @@ authorsRouter.get("/", async (request, response, next) => {
 })
 
 
-authorsRouter.get("/:authorId", async (request, response, next) => {
+authorsRouter.get("/:authorId", JWTAuthMiddleware, async (request, response, next) => {
     try {
         const author = await AuthorsModel.findById(request.params.authorId)
         if (author) {
@@ -40,7 +41,7 @@ authorsRouter.get("/:authorId", async (request, response, next) => {
     }
 })
 
-authorsRouter.put("/:authorId", basicAuthMiddleware, async (request, response, next) => {
+authorsRouter.put("/:authorId", JWTAuthMiddleware, async (request, response, next) => {
     try {
         if (request.author._id.toString() === request.params.authorId || request.author.role === "Admin") {
             const updatedAuthor = await AuthorsModel.findByIdAndUpdate(request.params.authorId, request.body, { new: true, runValidators: true })
@@ -58,7 +59,7 @@ authorsRouter.put("/:authorId", basicAuthMiddleware, async (request, response, n
     }
 })
 
-authorsRouter.delete("/:authorId", basicAuthMiddleware, async (request, response, next) => {
+authorsRouter.delete("/:authorId", JWTAuthMiddleware, async (request, response, next) => {
     try {
         if (request.author._id.toString() === request.params.authorId || request.author.role === "Admin") {
             const deletedAuthor = await AuthorsModel.findByIdAndDelete(request.params.authorId)
@@ -72,6 +73,25 @@ authorsRouter.delete("/:authorId", basicAuthMiddleware, async (request, response
 
         }
 
+    } catch (error) {
+        next(error)
+    }
+})
+
+authorsRouter.post("/login", async (request, response, next) => {
+    try {
+        const { email, password } = request.body
+
+        const author = await AuthorsModel.checkCredentials(email, password)
+
+        if (author) {
+            const payload = { _id: author._id, role: author.role }
+            const accessToken = await createAccessToken(payload)
+
+            response.send({ accessToken })
+        } else {
+            next(createError(401, "Credentials are not ok!"))
+        }
     } catch (error) {
         next(error)
     }

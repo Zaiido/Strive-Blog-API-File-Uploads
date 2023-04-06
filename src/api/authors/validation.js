@@ -34,8 +34,6 @@ export const checkAuthorSchema = checkSchema(authorSchema)
 export const generateBadRequest = (request, response, next) => {
     const errors = validationResult(request)
 
-    console.log(errors.array())
-
     if (errors.isEmpty()) {
         next()
     } else {

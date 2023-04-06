@@ -53,7 +53,6 @@ postSchema.static("findBlogs", async function (query) {
         .skip(query.options.skip)
         .limit(query.options.limit)
         .sort(query.options.sort)
-    console.log(query)
     const totalDocuments = await this.countDocuments(query.criteria)
     return { blogs, totalDocuments }
 })

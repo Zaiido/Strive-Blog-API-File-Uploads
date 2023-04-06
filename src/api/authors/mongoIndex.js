@@ -4,9 +4,22 @@ import AuthorsModel from "./model.js"
 import createHttpError from "http-errors"
 import { createAccessToken } from "../../lib/auth/tools.js"
 import { JWTAuthMiddleware } from "../../lib/auth/jwtAuth.js"
-
+import passport from "passport"
 
 const authorsRouter = Express.Router()
+
+
+authorsRouter.get("/auth/google", passport.authenticate("google", { scope: ["profile", " email"] }))
+
+authorsRouter.get("/auth/google/callback", passport.authenticate("google", { session: false }), (request, response, next) => {
+    try {
+        response.redirect(`${process.env.API_URL}?accessToken=${request.user.accessToken}`)
+    } catch (error) {
+        next(error)
+    }
+})
+
+
 
 authorsRouter.post("/register", async (request, response, next) => {
     try {

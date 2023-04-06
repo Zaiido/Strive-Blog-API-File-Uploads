@@ -8,11 +8,18 @@ import filesRouter from './api/file/index.js'
 import mongoose from 'mongoose'
 import postsRouter from './api/blogPosts/mongoIndex.js'
 import authorsRouter from './api/authors/mongoIndex.js'
+import passport from 'passport'
+import googleStrategy from './lib/auth/googleOAuth.js'
 
 
 const server = Express()
 const port = process.env.PORT
 const publicFolderPath = join(process.cwd(), "./public")
+
+
+passport.use("google", googleStrategy)
+
+
 
 const whitelist = [process.env.FE_DEV_URL, process.env.FE_PROD_URL]
 server.use(cors({
@@ -27,6 +34,7 @@ server.use(cors({
 
 server.use(Express.static(publicFolderPath))
 server.use(Express.json())
+server.use(passport.initialize())
 
 server.use("/authors", authorsRouter)
 server.use("/blogPosts", postsRouter)

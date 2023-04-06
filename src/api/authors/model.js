@@ -23,12 +23,15 @@ const authorSchema = new Schema({
     },
     password: {
         type: String,
-        required: true
+        required: false // Create an Express Validation to handle this
     },
     role: {
         type: String,
         default: "User",
         enum: ["Admin", "User"]
+    },
+    googleId: {
+        type: String
     }
 
 }, { timestamps: true })

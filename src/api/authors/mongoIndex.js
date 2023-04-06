@@ -14,7 +14,7 @@ authorsRouter.get("/auth/google", passport.authenticate("google", { scope: ["pro
 
 authorsRouter.get("/auth/google/callback", passport.authenticate("google", { session: false }), (request, response, next) => {
     try {
-        response.redirect(`${process.env.API_URL}?accessToken=${request.user.accessToken}`)
+        response.redirect(`${process.env.FE_URL}?accessToken=${request.user.accessToken}`)
     } catch (error) {
         next(error)
     }

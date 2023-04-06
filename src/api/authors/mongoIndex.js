@@ -4,6 +4,7 @@ import AuthorsModel from "./model.js"
 import createHttpError from "http-errors"
 import { createAccessToken } from "../../lib/auth/tools.js"
 import { JWTAuthMiddleware } from "../../lib/auth/jwtAuth.js"
+import { checkAuthorSchema, generateBadRequest } from "./validation.js"
 import passport from "passport"
 
 const authorsRouter = Express.Router()
@@ -21,7 +22,7 @@ authorsRouter.get("/auth/google/callback", passport.authenticate("google", { ses
 
 
 
-authorsRouter.post("/register", async (request, response, next) => {
+authorsRouter.post("/register", checkAuthorSchema, generateBadRequest, async (request, response, next) => {
     try {
         const newAuthor = new AuthorsModel(request.body)
         const { _id } = await newAuthor.save()

@@ -48,11 +48,12 @@ const postSchema = new Schema({
 }, { timestamps: true })
 
 postSchema.static("findBlogs", async function (query) {
-    const blogs = await this.find(query.criteria, query.options.fields)
+    const blogs = await this.find({ "title": new RegExp(query.criteria.title, "i") }, query.options.fields)
         .populate('authors')
         .skip(query.options.skip)
         .limit(query.options.limit)
         .sort(query.options.sort)
+    console.log(query)
     const totalDocuments = await this.countDocuments(query.criteria)
     return { blogs, totalDocuments }
 })
